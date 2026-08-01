@@ -1,9 +1,10 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+import pdfplumber
+import shutil
 
 app = FastAPI()
 
-# This allows your friend's frontend (running on a different port) to talk to this backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,8 +18,20 @@ def home():
 
 @app.post("/extract")
 async def extract(file: UploadFile = File(...)):
-    contents = await file.read()
+    # Save the uploaded file temporarily so pdfplumber can read it
+    temp_path = f"temp_{file.filename}"
+    with open(temp_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    # Read the text out of the PDF
+    text = ""
+    with pdfplumber.open(temp_path) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+
     return {
         "filename": file.filename,
-        "size_bytes": len(contents)
+        "extracted_text_preview": text[:500]  # just first 500 characters for now
     }
