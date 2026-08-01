@@ -4,5 +4,60 @@
     "action": "price_correction_approved",
     "corrected_price_per_unit": 4500,
     "status": "approved"
+  },
+  {
+    "vendor_name": "NovaTech Software Solutions Pvt. Ltd.",
+    "action": "auto_approved_no_issues",
+    "status": "approved"
+  },
+  {
+    "vendor_name": "AlphaTech Cloud Services Pvt. Ltd.",
+    "action": "audit_findings_approved",
+    "audit_result": {
+      "mismatches": [
+        {
+          "field": "price_per_unit",
+          "contract_value": "4200.0",
+          "invoice_value": "4800.0",
+          "severity": "high",
+          "explanation": "The invoiced unit price of 4800.0 exceeds the contracted unit price of 4200.0."
+        },
+        {
+          "field": "quantity",
+          "contract_value": "40",
+          "invoice_value": "42",
+          "severity": "high",
+          "explanation": "The billed quantity of 42 units exceeds the agreed contract quantity of 40 units."
+        },
+        {
+          "field": "total_amount",
+          "contract_value": "168000.0",
+          "invoice_value": "201600.0",
+          "severity": "high",
+          "explanation": "The total invoiced amount of 201600.0 exceeds the contracted total of 168000.0."
+        },
+        {
+          "field": "sla_terms",
+          "contract_value": "Guaranteed 24-hour response time for all support tickets raised by Buyer.",
+          "invoice_value": "None",
+          "severity": "medium",
+          "explanation": "The 24-hour support response SLA specified in the contract is completely missing from the invoice."
+        },
+        {
+          "field": "notice_clause",
+          "contract_value": "Written notice of non-renewal at least 30 days prior to the end of the then-current term.",
+          "invoice_value": "No advance written notice of this price change was issued to Buyer.",
+          "severity": "medium",
+          "explanation": "The invoice omits the contracted 30-day notice term and states that no advance written notice was issued for the price change."
+        }
+      ],
+      "estimated_cost_impact": 33600
+    },
+    "status": "approved"
+  },
+  {
+    "vendor_name": "NovaTech Software Solutions Pvt. Ltd.",
+    "action": "auto_approved_no_issues",
+    "status": "approved"
   }
 ]
