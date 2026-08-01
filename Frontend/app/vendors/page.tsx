@@ -21,6 +21,14 @@ const RISK_STYLES: Record<string, string> = {
     'High risk': 'bg-[rgba(239,68,68,0.1)] text-[#EF4444] border-[rgba(239,68,68,0.3)]',
 };
 
+const RISK_ORDER: Record<string, number> = {
+    'Low risk': 0,
+    'Medium risk': 1,
+    'High risk': 2,
+};
+
+const sortedVendors = [...vendors].sort((a, b) => RISK_ORDER[a.risk] - RISK_ORDER[b.risk]);
+
 const chartData = vendors.map(v => ({ name: v.name.split(' ')[0], discrepancies: v.discrepancies }));
 
 export default function VendorsPage() {
@@ -42,7 +50,7 @@ export default function VendorsPage() {
 
                     {/* Vendor Cards Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {vendors.map((v, idx) => (
+                        {sortedVendors.map((v, idx) => (
                             <motion.div
                                 key={v.name}
                                 initial={{ opacity: 0, y: 24 }}
