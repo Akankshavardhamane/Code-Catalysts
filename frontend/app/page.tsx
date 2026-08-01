@@ -10,6 +10,8 @@ import NegotiationEmailCard from '@/components/NegotiationEmailCard';
 import ApproveSyncButton from '@/components/ApproveSyncButton';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const API_BASE_URL = 'https://code-catalysts.onrender.com';
+
 export default function Dashboard() {
   const [pipelineState, setPipelineState] = useState<'idle' | 'running' | 'completed' | 'error'>('idle');
   const [syncState, setSyncState] = useState<'idle' | 'running' | 'completed'>('idle');
@@ -18,6 +20,7 @@ export default function Dashboard() {
   const [auditState, setAuditState] = useState<'idle' | 'running' | 'completed'>('idle');
   const [negotiationState, setNegotiationState] = useState<'idle' | 'running' | 'completed'>('idle');
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [results, setResults] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
@@ -33,7 +36,7 @@ export default function Dashboard() {
     formData.append('invoice_file', invoiceFile);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/process', {
+      const response = await fetch(`${API_BASE_URL}/process`, {
         method: 'POST',
         body: formData,
       });
@@ -57,6 +60,7 @@ export default function Dashboard() {
       if (data.auto_approved) {
         setSyncState('completed');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Pipeline failed:', err);
       setErrorMsg(err.message || 'Something went wrong while processing the documents.');
@@ -67,7 +71,7 @@ export default function Dashboard() {
   const handleApproveSync = async () => {
     setSyncState('running');
     try {
-      const response = await fetch('http://127.0.0.1:8000/approve-sync', {
+      const response = await fetch(`${API_BASE_URL}/approve-sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -123,7 +127,7 @@ export default function Dashboard() {
             >
               <p className="font-semibold mb-1">Analysis failed</p>
               <p className="text-sm text-[#FCA5A5]">{errorMsg}</p>
-              <p className="text-xs text-[#94A3B8] mt-2">Make sure the backend server is running on http://127.0.0.1:8000</p>
+              <p className="text-xs text-[#94A3B8] mt-2">Make sure the backend server is reachable.</p>
             </motion.div>
           )}
 
