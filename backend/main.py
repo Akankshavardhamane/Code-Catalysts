@@ -73,3 +73,39 @@ Document text:
         return {"error": "Could not parse JSON from model", "raw_output": raw_output}
 
     return extracted_data
+
+@app.post("/audit")
+async def audit(contract: dict, invoice: dict):
+    prompt = f"""Compare this contract data and invoice data. List every mismatch you find — price differences, missing SLA terms, unusual quantities, upcoming renewal risks. For each, give severity (high/medium/low) and a one-sentence explanation.
+
+Also estimate the annual dollar cost impact if a price mismatch exists (price difference * quantity, or a reasonable estimate).
+
+Return ONLY valid JSON, no markdown, no explanation, matching this exact shape:
+{{
+  "mismatches": [
+    {{"field": string, "contract_value": string, "invoice_value": string, "severity": "high" or "medium" or "low", "explanation": string}}
+  ],
+  "estimated_cost_impact": number
+}}
+
+Contract data:
+{json.dumps(contract)}
+
+Invoice data:
+{json.dumps(invoice)}
+"""
+
+    response = model.generate_content(prompt)
+    raw_output = response.text.strip()
+
+    if raw_output.startswith("```"):
+        raw_output = raw_output.strip("`")
+        if raw_output.startswith("json"):
+            raw_output = raw_output[4:].strip()
+
+    try:
+        audit_result = json.loads(raw_output)
+    except json.JSONDecodeError:
+        return {"error": "Could not parse JSON from model", "raw_output": raw_output}
+
+    return audit_result
