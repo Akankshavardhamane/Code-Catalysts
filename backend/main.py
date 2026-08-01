@@ -141,3 +141,21 @@ Audit findings:
         return {"error": "Could not parse JSON from model", "raw_output": raw_output}
 
     return negotiation
+
+@app.post("/approve-sync")
+async def approve_sync(record: dict):
+    erp_file = "mock_erp.json"
+
+    # Load existing records, or start fresh if file doesn't exist yet
+    if os.path.exists(erp_file):
+        with open(erp_file, "r") as f:
+            db = json.load(f)
+    else:
+        db = []
+
+    db.append(record)
+
+    with open(erp_file, "w") as f:
+        json.dump(db, f, indent=2)
+
+    return {"status": "synced", "record": record}
