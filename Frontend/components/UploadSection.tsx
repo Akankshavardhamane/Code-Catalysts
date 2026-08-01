@@ -1,26 +1,36 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnalysis: () => void; isRunning: boolean }) {
-    const [contractFile, setContractFile] = useState<string | null>(null);
-    const [invoiceFile, setInvoiceFile] = useState<string | null>(null);
+export default function UploadSection({
+    onRunAnalysis,
+    isRunning,
+}: {
+    onRunAnalysis: (contractFile: File, invoiceFile: File) => void;
+    isRunning: boolean;
+}) {
+    const [contractFile, setContractFile] = useState<File | null>(null);
+    const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
     const [ripple, setRipple] = useState<{ id: string; x: number; y: number } | null>(null);
 
-    const handleUpload = (type: 'contract' | 'invoice') => {
-        if (type === 'contract') setContractFile('Contract_2026_Q1.pdf');
-        if (type === 'invoice') setInvoiceFile('Invoice_Q1_Final.pdf');
+    const contractInputRef = useRef<HTMLInputElement>(null);
+    const invoiceInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileSelect = (type: 'contract' | 'invoice', file: File | undefined) => {
+        if (!file) return;
+        if (type === 'contract') setContractFile(file);
+        if (type === 'invoice') setInvoiceFile(file);
     };
 
     const canRun = !!contractFile && !!invoiceFile && !isRunning;
 
     const handleRunClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        if (!canRun) return;
+        if (!canRun || !contractFile || !invoiceFile) return;
         const rect = e.currentTarget.getBoundingClientRect();
         setRipple({ id: Date.now().toString(), x: e.clientX - rect.left, y: e.clientY - rect.top });
         setTimeout(() => setRipple(null), 600);
-        onRunAnalysis();
+        onRunAnalysis(contractFile, invoiceFile);
     };
 
     return (
@@ -43,14 +53,21 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                     whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    onClick={() => handleUpload('contract')}
+                    onClick={() => contractInputRef.current?.click()}
                     className={`relative rounded-[24px] p-8 flex flex-col items-center justify-center cursor-pointer border overflow-hidden group
             ${contractFile
                             ? 'bg-[rgba(91,95,239,0.1)] border-[rgba(91,95,239,0.4)] shadow-[0_0_24px_rgba(91,95,239,0.15)]'
                             : 'bg-[#1E293B] border-[rgba(255,255,255,0.08)] hover:border-[rgba(91,95,239,0.4)] hover:bg-[rgba(91,95,239,0.05)]'
                         } transition-all duration-300`}
                 >
-                    {/* Hover glow */}
+                    <input
+                        type="file"
+                        accept=".pdf"
+                        ref={contractInputRef}
+                        className="hidden"
+                        onChange={(e) => handleFileSelect('contract', e.target.files?.[0])}
+                    />
+
                     <div className="absolute inset-0 bg-gradient-to-br from-[#5B5FEF]/10 via-transparent to-[#00D4FF]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-[24px]" />
 
                     <motion.div
@@ -73,7 +90,7 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                                 exit={{ opacity: 0 }}
                                 className="text-xs font-medium text-[#00D4FF] bg-[rgba(0,212,255,0.1)] border border-[rgba(0,212,255,0.2)] px-3 py-1 rounded-full mt-1"
                             >
-                                ✓ {contractFile}
+                                ✓ {contractFile.name}
                             </motion.span>
                         ) : (
                             <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-[#94A3B8] mt-1">Click or drop file</motion.p>
@@ -86,13 +103,21 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                     whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    onClick={() => handleUpload('invoice')}
+                    onClick={() => invoiceInputRef.current?.click()}
                     className={`relative rounded-[24px] p-8 flex flex-col items-center justify-center cursor-pointer border overflow-hidden group
             ${invoiceFile
                             ? 'bg-[rgba(91,95,239,0.1)] border-[rgba(91,95,239,0.4)] shadow-[0_0_24px_rgba(91,95,239,0.15)]'
                             : 'bg-[#1E293B] border-[rgba(255,255,255,0.08)] hover:border-[rgba(91,95,239,0.4)] hover:bg-[rgba(91,95,239,0.05)]'
                         } transition-all duration-300`}
                 >
+                    <input
+                        type="file"
+                        accept=".pdf"
+                        ref={invoiceInputRef}
+                        className="hidden"
+                        onChange={(e) => handleFileSelect('invoice', e.target.files?.[0])}
+                    />
+
                     <div className="absolute inset-0 bg-gradient-to-br from-[#5B5FEF]/10 via-transparent to-[#00D4FF]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-[24px]" />
 
                     <motion.div
@@ -115,7 +140,7 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                                 exit={{ opacity: 0 }}
                                 className="text-xs font-medium text-[#00D4FF] bg-[rgba(0,212,255,0.1)] border border-[rgba(0,212,255,0.2)] px-3 py-1 rounded-full mt-1"
                             >
-                                ✓ {invoiceFile}
+                                ✓ {invoiceFile.name}
                             </motion.span>
                         ) : (
                             <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-[#94A3B8] mt-1">Click or drop file</motion.p>
@@ -124,7 +149,7 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                 </motion.div>
             </div>
 
-            {/* Premium Run Button */}
+            {/* Run Button */}
             <div className="flex justify-center">
                 <motion.button
                     onClick={handleRunClick}
@@ -138,7 +163,6 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                             : 'bg-[#1E293B] text-[#94A3B8] border border-[rgba(255,255,255,0.08)] cursor-not-allowed'
                         }`}
                 >
-                    {/* Animated glow overlay */}
                     {canRun && (
                         <motion.div
                             className="absolute inset-0 bg-white/10 rounded-[24px]"
@@ -147,7 +171,6 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                         />
                     )}
 
-                    {/* Ripple */}
                     <AnimatePresence>
                         {ripple && (
                             <motion.span
@@ -182,7 +205,6 @@ export default function UploadSection({ onRunAnalysis, isRunning }: { onRunAnaly
                 </motion.button>
             </div>
 
-            {/* Helper hint */}
             {!contractFile || !invoiceFile ? (
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-xs text-[#94A3B8] mt-4">
                     Upload both documents above to enable analysis

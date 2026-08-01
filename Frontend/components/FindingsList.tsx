@@ -5,18 +5,21 @@ import { motion } from 'framer-motion';
 
 type Mismatch = {
     field: string;
-    contract: string;
-    invoice: string;
-    severity: 'high' | 'medium';
+    contract_value: string;
+    invoice_value: string;
+    severity: 'high' | 'medium' | 'low';
+    explanation?: string;
 };
 
-const findings: Mismatch[] = [
-    { field: "Price per license", contract: "₹4,500", invoice: "₹5,000", severity: "high" },
-    { field: "SLA clause", contract: "24hr support", invoice: "Not mentioned", severity: "medium" },
-    { field: "Price change notice", contract: "30 days required", invoice: "No notice given", severity: "high" },
-];
+export default function FindingsList({
+    mismatches,
+    costImpact,
+}: {
+    mismatches: Mismatch[];
+    costImpact?: number;
+}) {
+    const findings = mismatches || [];
 
-export default function FindingsList() {
     if (findings.length === 0) {
         return (
             <section className="rounded-[24px] border border-[rgba(34,197,94,0.2)] bg-[rgba(34,197,94,0.05)] p-12 flex flex-col items-center text-center">
@@ -47,6 +50,13 @@ export default function FindingsList() {
                 </span>
             </div>
 
+            {typeof costImpact === 'number' && costImpact > 0 && (
+                <div className="mb-6 rounded-[20px] border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.08)] p-5">
+                    <p className="text-xs text-[#F59E0B] font-bold uppercase tracking-widest mb-1">Estimated Cost Impact</p>
+                    <p className="text-2xl font-bold text-white">₹{costImpact.toLocaleString('en-IN')}</p>
+                </div>
+            )}
+
             <div className="grid gap-4">
                 {findings.map((item, idx) => (
                     <motion.div
@@ -61,7 +71,9 @@ export default function FindingsList() {
                             <span className={`px-3 py-1 text-xs font-bold rounded-full border
                 ${item.severity === 'high'
                                     ? 'bg-[rgba(239,68,68,0.1)] text-[#EF4444] border-[rgba(239,68,68,0.3)]'
-                                    : 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B] border-[rgba(245,158,11,0.3)]'
+                                    : item.severity === 'medium'
+                                    ? 'bg-[rgba(245,158,11,0.1)] text-[#F59E0B] border-[rgba(245,158,11,0.3)]'
+                                    : 'bg-[rgba(148,163,184,0.1)] text-[#94A3B8] border-[rgba(148,163,184,0.3)]'
                                 }`}
                             >
                                 {item.severity.toUpperCase()}
@@ -72,13 +84,17 @@ export default function FindingsList() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="bg-[rgba(34,197,94,0.07)] rounded-[16px] p-4 border border-[rgba(34,197,94,0.15)]">
                                 <p className="text-[10px] text-[#22C55E] font-bold uppercase tracking-widest mb-2">Contract Value</p>
-                                <p className="font-bold text-white text-lg">{item.contract}</p>
+                                <p className="font-bold text-white text-lg break-words">{item.contract_value}</p>
                             </div>
                             <div className="bg-[rgba(239,68,68,0.07)] rounded-[16px] p-4 border border-[rgba(239,68,68,0.15)]">
                                 <p className="text-[10px] text-[#EF4444] font-bold uppercase tracking-widest mb-2">Invoice Value</p>
-                                <p className="font-bold text-white text-lg">{item.invoice}</p>
+                                <p className="font-bold text-white text-lg break-words">{item.invoice_value}</p>
                             </div>
                         </div>
+
+                        {item.explanation && (
+                            <p className="text-sm text-[#94A3B8] mt-4 leading-relaxed">{item.explanation}</p>
+                        )}
                     </motion.div>
                 ))}
             </div>
