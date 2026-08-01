@@ -109,3 +109,35 @@ Invoice data:
         return {"error": "Could not parse JSON from model", "raw_output": raw_output}
 
     return audit_result
+
+@app.post("/negotiate")
+async def negotiate(audit_result: dict, vendor_name: str = "the vendor"):
+    prompt = f"""Given these procurement audit findings, draft a professional counter-offer email to the vendor addressing the specific mismatches found, and list 2-3 suggested cost-saving actions.
+
+Return ONLY valid JSON, no markdown, no explanation, matching this exact shape:
+{{
+  "subject": string,
+  "body": string,
+  "suggested_actions": [string]
+}}
+
+Vendor name: {vendor_name}
+
+Audit findings:
+{json.dumps(audit_result)}
+"""
+
+    response = model.generate_content(prompt)
+    raw_output = response.text.strip()
+
+    if raw_output.startswith("```"):
+        raw_output = raw_output.strip("`")
+        if raw_output.startswith("json"):
+            raw_output = raw_output[4:].strip()
+
+    try:
+        negotiation = json.loads(raw_output)
+    except json.JSONDecodeError:
+        return {"error": "Could not parse JSON from model", "raw_output": raw_output}
+
+    return negotiation
