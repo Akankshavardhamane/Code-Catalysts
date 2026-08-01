@@ -12,7 +12,7 @@ const stats = [
     { value: 'Rs. 4,82,000', label: 'Total overcharges prevented', sub: 'This quarter', color: '#22C55E' },
     { value: '23', label: 'Discrepancies caught', sub: 'Across all vendors', color: '#5B5FEF' },
     { value: '94%', label: 'Contracts audited on time', sub: 'Last 90 days', color: '#00D4FF' },
-    { value: '2.1 hrs', label: 'Avg. time to resolve', sub: 'Per flagged issue', color: '#F59E0B' },
+    { value: '12', label: 'Invoices processed', sub: 'This month', color: '#F59E0B' },
 ];
 
 const monthly = [

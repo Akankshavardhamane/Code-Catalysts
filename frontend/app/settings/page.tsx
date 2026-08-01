@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -51,9 +51,8 @@ export default function SettingsPage() {
             <Sidebar />
             <main className="flex-1 flex flex-col overflow-hidden">
                 <Header />
-                <div className="flex-1 overflow-y-auto p-10 space-y-8 max-w-3xl">
+                <div className="flex-1 overflow-y-auto p-10 space-y-8 max-w-4xl mx-auto w-full">
 
-                    {/* Title */}
                     <motion.div
                         initial={{ opacity: 0, y: -16 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -63,7 +62,6 @@ export default function SettingsPage() {
                         <p className="text-[#94A3B8]">Configure your VendorOps environment</p>
                     </motion.div>
 
-                    {/* ERP Connection Card */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -103,11 +101,10 @@ export default function SettingsPage() {
                                 }`}
                         >
                             <RefreshCw className={`w-4 h-4 ${reconnecting ? 'animate-spin' : ''}`} />
-                            {reconnecting ? 'Reconnecting…' : 'Reconnect'}
+                            {reconnecting ? 'Reconnecting...' : 'Reconnect'}
                         </motion.button>
                     </motion.div>
 
-                    {/* Notification Preferences Card */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -122,7 +119,6 @@ export default function SettingsPage() {
                         </div>
                     </motion.div>
 
-                    {/* Team Card */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
